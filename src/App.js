@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
-import _ from "lodash";
+import { hasIn, keys, uniq, find } from "lodash";
 import parseParams from "./assets/parse.params.js";
 
 // import Navbar from "./components/navbar/navbar.component";
 
 import Localization from "./localization/Localization";
+import Colors from "./components/Colors";
 
-// import "./App.scss";
+import "./App.scss";
 
 const App = () => {
   const [currList, setCurrList] = useState([
@@ -29,23 +30,38 @@ const App = () => {
   const [message, setMessage] = useState("");
   const [alert, setAlert] = useState(0);
   const [lang, setLang] = useState("en");
+  const [colors, setColors] = useState({ text: "#000000", bg: "#FFFFFF" });
+
+  useEffect(() => {
+    document.body.style.backgroundColor = colors.bg;
+    document.body.style.color = colors.text;
+    console.log(colors);
+  }, [colors]);
 
   useEffect(() => {
     const url = new URL(window.location);
     let params = parseParams(url.search);
     if (Object.keys(params).length > 0) {
-      // const custom = _.hasIn(params, "custom") ? params.custom.split(":") : {};
+      // const custom = hasIn(params, "custom") ? params.custom.split(":") : {};
 
-      if (_.hasIn(params, "lang")) {
+      if (hasIn(params, "lang")) {
         if (params.lang in Localization) {
           setLang(params.lang);
         } else setLang("en");
       }
 
+      if (hasIn(params, "text")) {
+        setColors((prev) => ({ ...prev, text: params.text }));
+      }
+
+      if (hasIn(params, "bg")) {
+        setColors((prev) => ({ ...prev, bg: params.bg }));
+      }
+
       if (
-        _.hasIn(params, "custom_base") &&
-        _.hasIn(params, "custom_target") &&
-        _.hasIn(params, "custom_rate")
+        hasIn(params, "custom_base") &&
+        hasIn(params, "custom_target") &&
+        hasIn(params, "custom_rate")
       ) {
         let { custom_base, custom_target, custom_rate } = params;
         custom_base = custom_base.toString().replace(/\W/g, "").toUpperCase();
@@ -78,7 +94,7 @@ const App = () => {
     if (currList) {
       let tmp = [];
       currList.forEach((arr) => tmp.push(arr.base, arr.target));
-      setSymbols(_.uniq(tmp));
+      setSymbols(uniq(tmp));
 
       setForm({
         x1: 1,
@@ -102,7 +118,7 @@ const App = () => {
   }, [alert, lang]);
 
   useEffect(() => {
-    console.log(form);
+    // console.log(form);
   }, [form]);
 
   const onHandlerChangeX = (event) => {
@@ -130,7 +146,7 @@ const App = () => {
       if (value === form.y2) return;
 
       const code = value + form.y2;
-      const currency = _.find(currList, { code: code });
+      const currency = find(currList, { code: code });
 
       if (!currency) {
         setAlert(1);
@@ -146,7 +162,7 @@ const App = () => {
       if (value === form.y1) return;
 
       const code = form.y1 + value;
-      const currency = _.find(currList, { code: code });
+      const currency = find(currList, { code: code });
 
       if (!currency) {
         setAlert(1);
@@ -244,7 +260,7 @@ const App = () => {
             </div>
           </form>
 
-          <table className="table table-hover table-sm col-12">
+          <table className="table-hover table-sm col-sm-12 col-lg-6 ">
             <tbody>
               {currList &&
                 currList.map(({ base, rate, target }, i) => (
@@ -267,6 +283,80 @@ const App = () => {
                   </tr>
                 ))}
             </tbody>
+          </table>
+
+          <table className="col-sm-12 col-lg-6" cellPadding={10}>
+            <tbody>
+              <tr>
+                <td align="right" style={{ borderRight: "1px solid" }}>
+                  <label htmlFor="language">Language: </label>
+                </td>
+                <td>
+                  <select
+                    name="language"
+                    value={lang}
+                    onChange={(e) => setLang(e.target.value)}
+                  >
+                    {keys(Localization)
+                      .sort()
+                      .map((list, i) => (
+                        <option key={i} value={list}>
+                          {Localization[list].name}
+                        </option>
+                      ))}
+                  </select>
+                </td>
+              </tr>
+            </tbody>
+            {colors && (
+              <tfoot>
+                <tr>
+                  <td align="right" style={{ borderRight: "1px solid" }}>
+                    <label htmlFor="TextColor">Text Color: </label>
+                  </td>
+                  <td>
+                    <select
+                      name="TextColor"
+                      value={colors.text}
+                      onChange={(e) => {
+                        e.persist();
+                        setColors((prev) => ({
+                          ...prev,
+                          text: e.target.value,
+                        }));
+                      }}
+                    >
+                      {Colors.sort().map((color, i) => (
+                        <option key={i} value={color.code}>
+                          {color.name}
+                        </option>
+                      ))}
+                    </select>
+                  </td>
+                </tr>
+                <tr>
+                  <td align="right" className="td-right-border">
+                    <label htmlFor="BgColor">Background Color: </label>
+                  </td>
+                  <td>
+                    <select
+                      name="BgColor"
+                      value={colors.bg}
+                      onChange={(e) => {
+                        e.persist();
+                        setColors((prev) => ({ ...prev, bg: e.target.value }));
+                      }}
+                    >
+                      {Colors.sort().map((color, i) => (
+                        <option key={i} value={color.code}>
+                          {color.name}
+                        </option>
+                      ))}
+                    </select>
+                  </td>
+                </tr>
+              </tfoot>
+            )}
           </table>
         </div>
       </div>
