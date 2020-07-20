@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { hasIn, keys, uniq, find } from "lodash";
+import { hasIn, isArray, last, keys, uniq, find } from "lodash";
 import { format } from "date-fns";
 
 import parseParams from "./assets/parse.params.js";
@@ -11,7 +11,7 @@ import Colors from "./components/colors.component";
 import currencyList from "./components/currencyList";
 
 const App = () => {
-  const [currList, setCurrList] = useState([]);
+  const [currList, setCurrList] = useState(currencyList);
   const [customCurrList, setCustomCurrList] = useState([]);
 
   const [symbols, setSymbols] = useState();
@@ -42,8 +42,9 @@ const App = () => {
     fetch("https://teklif.az/api/")
       .then((response) => response.json())
       .then((doc) => {
+        const codes = doc.data.map(({ code }) => code);
         setCurrList((prev) => [
-          ...prev,
+          ...prev.filter(({ code }) => !codes.includes(code)),
           ...doc.data,
           ...doc.data.map(({ base, target, rate }) => ({
             code: target + base,
@@ -55,13 +56,11 @@ const App = () => {
         setDate((prev) => doc.date);
       })
       .catch((error) => {
-        setCurrList((prev) => [...prev, ...currencyList]);
+        // setCurrList((prev) => [...prev, ...currencyList]);
         console.error("Error:", error);
       });
 
     if (Object.keys(params).length > 0) {
-      // const custom = hasIn(params, "custom") ? params.custom.split(":") : {};
-
       if (hasIn(params, "lang")) {
         if (params.lang in Localization) {
           setLang(params.lang);
@@ -76,12 +75,19 @@ const App = () => {
         setColors((prev) => ({ ...prev, bg: params.bg }));
       }
 
+      // const custom = hasIn(params, "custom") ? params.custom.split(":") : {};
       if (
         hasIn(params, "custom_base") &&
         hasIn(params, "custom_target") &&
         hasIn(params, "custom_rate")
       ) {
         let { custom_base, custom_target, custom_rate } = params;
+        custom_base = isArray(custom_base) ? last(custom_base) : custom_base;
+        custom_target = isArray(custom_target)
+          ? last(custom_target)
+          : custom_target;
+        custom_rate = isArray(custom_rate) ? last(custom_rate) : custom_rate;
+
         custom_base = custom_base.toString().replace(/\W/g, "").toUpperCase();
         custom_target = custom_target
           .toString()
@@ -290,7 +296,7 @@ const App = () => {
           <table className="table-hover table-sm col-sm-12 col-lg-6 ">
             <tbody>
               {currList &&
-                currList.map(({ base, rate, target }, i) => (
+                currList.map(({ code, base, rate, target }, i) => (
                   <tr
                     key={i}
                     style={{ cursor: "pointer" }}
@@ -307,6 +313,7 @@ const App = () => {
                     <td>1 {base}</td>
                     <td>{Localization[lang].equals}</td>
                     <td> {rate + " " + target}</td>
+                    <td>{code}</td>
                   </tr>
                 ))}
             </tbody>

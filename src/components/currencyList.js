@@ -1,4 +1,5 @@
 const currencyList = [
+  { code: "EUREUR", base: "EUR", target: "EUR", rate: "1" },
   { code: "EURUSD", base: "EUR", target: "USD", rate: "1.2897" },
   { code: "USDEUR", base: "USD", target: "EUR", rate: "0.7753" },
   { code: "EURCHF", base: "EUR", target: "CHF", rate: "1.3135" },
@@ -11,7 +12,6 @@ const currencyList = [
   { code: "USDCHF", base: "USD", target: "CHF", rate: "1.0040" },
   { code: "GBPCAD", base: "GBP", target: "CAD", rate: "1.7574" },
   { code: "CADGBP", base: "CAD", target: "GBP", rate: "0.5690" },
-  { code: "EUREUR", base: "EUR", target: "EUR", rate: "1" },
 ];
 
 export default currencyList;
