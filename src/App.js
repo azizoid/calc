@@ -1,46 +1,64 @@
 import React, { useEffect, useState } from "react";
 import { hasIn, keys, uniq, find } from "lodash";
+import { format } from "date-fns";
+
 import parseParams from "./assets/parse.params.js";
 
-// import Navbar from "./components/navbar/navbar.component";
+import Navbar from "./components/navbar/navbar.component";
 
-import Localization from "./localization/Localization";
-import Colors from "./components/Colors";
-
-import "./App.scss";
+import Localization from "./components/localization.component";
+import Colors from "./components/colors.component";
+import currencyList from "./components/currencyList";
 
 const App = () => {
-  const [currList, setCurrList] = useState([
-    { code: "EURUSD", base: "EUR", target: "USD", rate: "1.2897" },
-    { code: "USDEUR", base: "USD", target: "EUR", rate: "0.7753" },
-    { code: "EURCHF", base: "EUR", target: "CHF", rate: "1.3135" },
-    { code: "CHFEUR", base: "CHF", target: "EUR", rate: "0.7613" },
-    { code: "EURGBP", base: "EUR", target: "GBP", rate: "0.8631" },
-    { code: "GBPEUR", base: "GBP", target: "EUR", rate: "1.1586" },
-    { code: "USDJPY", base: "USD", target: "JPY", rate: "109.620" },
-    { code: "JPYUSD", base: "JPY", target: "USD", rate: "0.0091" },
-    { code: "CHFUSD", base: "CHF", target: "USD", rate: "0.9960" },
-    { code: "USDCHF", base: "USD", target: "CHF", rate: "1.0040" },
-    { code: "GBPCAD", base: "GBP", target: "CAD", rate: "1.7574" },
-    { code: "CADGBP", base: "CAD", target: "GBP", rate: "0.5690" },
-    { code: "EUREUR", base: "EUR", target: "EUR", rate: "1" },
-  ]);
+  const [currList, setCurrList] = useState([]);
+  const [customCurrList, setCustomCurrList] = useState([]);
+
   const [symbols, setSymbols] = useState();
   const [form, setForm] = useState({ x1: 1, x2: 1, y1: 1, y2: 1 });
   const [message, setMessage] = useState("");
   const [alert, setAlert] = useState(0);
   const [lang, setLang] = useState("en");
   const [colors, setColors] = useState({ text: "#000000", bg: "#FFFFFF" });
+  const [date, setDate] = useState(format(new Date(), "yyyy-MM-dd"));
 
   useEffect(() => {
     document.body.style.backgroundColor = colors.bg;
     document.body.style.color = colors.text;
-    console.log(colors);
   }, [colors]);
 
   useEffect(() => {
     const url = new URL(window.location);
     let params = parseParams(url.search);
+
+    /*
+    I created a small api for currencies taken from the 
+    https://www.ecb.europa.eu/stats/eurofxref/eurofxref-daily.xml
+
+    if it succeed, then this data will be our default values,
+    and immedeately create their reverse currency conversion.
+    if for some reason there will be a problem, then we use the data you provided in a task
+    */
+    fetch("https://teklif.az/api/")
+      .then((response) => response.json())
+      .then((doc) => {
+        setCurrList((prev) => [
+          ...prev,
+          ...doc.data,
+          ...doc.data.map(({ base, target, rate }) => ({
+            code: target + base,
+            base: target,
+            target: base,
+            rate: ((1 / rate) * 1).toFixed(4),
+          })),
+        ]);
+        setDate((prev) => doc.date);
+      })
+      .catch((error) => {
+        setCurrList((prev) => [...prev, ...currencyList]);
+        console.error("Error:", error);
+      });
+
     if (Object.keys(params).length > 0) {
       // const custom = hasIn(params, "custom") ? params.custom.split(":") : {};
 
@@ -70,7 +88,7 @@ const App = () => {
           .replace(/\W/g, "")
           .toUpperCase();
 
-        const newCurr = [
+        const custom = [
           {
             code: custom_base + custom_target,
             base: custom_base,
@@ -79,19 +97,23 @@ const App = () => {
           },
           {
             code: custom_target + custom_base,
-            base: custom_target,
             target: custom_base,
-            rate: (1 / custom_rate).toFixed(4),
+            base: custom_target,
+            rate: ((1 / custom_rate) * 1).toFixed(4),
           },
         ];
 
-        setCurrList((prev) => [...newCurr, ...prev]);
+        setCustomCurrList((prev) => [...custom, ...prev]);
       }
     }
   }, []);
 
   useEffect(() => {
-    if (currList) {
+    setCurrList((prev) => [...prev, ...customCurrList]);
+  }, [customCurrList]);
+
+  useEffect(() => {
+    if (currList.length > 1) {
       let tmp = [];
       currList.forEach((arr) => tmp.push(arr.base, arr.target));
       setSymbols(uniq(tmp));
@@ -179,6 +201,9 @@ const App = () => {
 
   return (
     <div className="App">
+      <div className="d-none d-lg-block">
+        <Navbar />
+      </div>
       <div className="container">
         <div className="row">
           {message.length > 0 && (
@@ -186,18 +211,20 @@ const App = () => {
               {message}
             </small>
           )}
-          <div className="col-12 text-center badge badge-info">
+          <div className="col-12 text-center alert alert-info">
             {form.x1 +
               " " +
               form.y1 +
               " " +
               Localization[lang].equals +
-              "" +
+              " " +
               form.x2 +
               " " +
-              form.y2}
+              form.y2 +
+              " / " +
+              date}
           </div>
-          <form className="col-12">
+          <form className="col-sm-12">
             <div className="form-row">
               <div className="form-group col-4">{Localization[lang].base}:</div>
               <div className="form-group col-4">
