@@ -151,7 +151,8 @@ const App = () => {
 
   const onHandlerChangeX = (event) => {
     let { name, value } = event.target;
-    value = value > 0 ? value * 1 : 0;
+    // value = value.replace(/[.]/g, ",");
+    // value = value > 0 ? value * 1 : 0;
 
     const code = name === "x1" ? form.y1 + form.y2 : form.y2 + form.y1;
     const currency = currList.filter((arr) => arr.code === code);
@@ -258,6 +259,18 @@ const App = () => {
                       </option>
                     ))}
                 </select>
+                <button
+                  onClick={() => {
+                    setForm((prev) => ({
+                      x1: prev.x2,
+                      x2: prev.x1,
+                      y1: prev.y2,
+                      y2: prev.y1,
+                    }));
+                  }}
+                >
+                  Switch
+                </button>
               </div>
             </div>
             <div className="form-row">
