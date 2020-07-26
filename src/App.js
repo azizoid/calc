@@ -44,8 +44,8 @@ const App = () => {
       .then((doc) => {
         const codes = doc.data.map(({ code }) => code);
         setCurrList((prev) => [
-          ...doc.data,
           ...prev.filter(({ code }) => !codes.includes(code)),
+          ...doc.data,
           ...doc.data.map(({ base, target, rate }) => ({
             code: target + base,
             base: target,
@@ -53,9 +53,10 @@ const App = () => {
             rate: ((1 / rate) * 1).toFixed(4),
           })),
         ]);
-        setDate(doc.date);
+        setDate((prev) => doc.date);
       })
       .catch((error) => {
+        // setCurrList((prev) => [...prev, ...currencyList]);
         console.error("Error:", error);
       });
 
@@ -144,6 +145,10 @@ const App = () => {
     };
   }, [alert, lang]);
 
+  useEffect(() => {
+    // console.log(form);
+  }, [form]);
+
   const onHandlerChangeX = (event) => {
     let { name, value } = event.target;
     // value = value.replace(/[.]/g, ",");
@@ -167,10 +172,7 @@ const App = () => {
     let { name, value } = event.target;
 
     if (name === "y1") {
-      if (value === form.y2) {
-        onSwitchHandler();
-        return;
-      }
+      if (value === form.y2) return;
 
       const code = value + form.y2;
       const currency = find(currList, { code: code });
@@ -186,10 +188,7 @@ const App = () => {
         y1: value,
       }));
     } else if (name === "y2") {
-      if (value === form.y1) {
-        onSwitchHandler();
-        return;
-      }
+      if (value === form.y1) return;
 
       const code = form.y1 + value;
       const currency = find(currList, { code: code });
@@ -205,15 +204,6 @@ const App = () => {
         y2: value,
       }));
     }
-  };
-
-  const onSwitchHandler = () => {
-    setForm((prev) => ({
-      x1: prev.x2,
-      x2: prev.x1,
-      y1: prev.y2,
-      y2: prev.y1,
-    }));
   };
 
   return (
@@ -271,23 +261,31 @@ const App = () => {
                     ))}
                 </select>
                 <button
-                  className="btn btn-link"
-                  onClick={onSwitchHandler.bind()}
+                  class="btn btn-link"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setForm((prev) => ({
+                      x1: prev.x2,
+                      x2: prev.x1,
+                      y1: prev.y2,
+                      y2: prev.y1,
+                    }));
+                  }}
                 >
                   <svg
                     width="1em"
                     height="1em"
                     viewBox="0 0 16 16"
-                    className="bi bi-arrow-repeat"
+                    class="bi bi-arrow-repeat"
                     fill="currentColor"
                     xmlns="http://www.w3.org/2000/svg"
                   >
                     <path
-                      fillRule="evenodd"
+                      fill-rule="evenodd"
                       d="M2.854 7.146a.5.5 0 0 0-.708 0l-2 2a.5.5 0 1 0 .708.708L2.5 8.207l1.646 1.647a.5.5 0 0 0 .708-.708l-2-2zm13-1a.5.5 0 0 0-.708 0L13.5 7.793l-1.646-1.647a.5.5 0 0 0-.708.708l2 2a.5.5 0 0 0 .708 0l2-2a.5.5 0 0 0 0-.708z"
                     />
                     <path
-                      fillRule="evenodd"
+                      fill-rule="evenodd"
                       d="M8 3a4.995 4.995 0 0 0-4.192 2.273.5.5 0 0 1-.837-.546A6 6 0 0 1 14 8a.5.5 0 0 1-1.001 0 5 5 0 0 0-5-5zM2.5 7.5A.5.5 0 0 1 3 8a5 5 0 0 0 9.192 2.727.5.5 0 1 1 .837.546A6 6 0 0 1 2 8a.5.5 0 0 1 .501-.5z"
                     />
                   </svg>

@@ -1,5 +1,5 @@
 const currencyList = [
-  // { code: "EUREUR", base: "EUR", target: "EUR", rate: "1" },
+  { code: "EUREUR", base: "EUR", target: "EUR", rate: "1" },
   { code: "EURUSD", base: "EUR", target: "USD", rate: "1.2897" },
   { code: "USDEUR", base: "USD", target: "EUR", rate: "0.7753" },
   { code: "EURCHF", base: "EUR", target: "CHF", rate: "1.3135" },
