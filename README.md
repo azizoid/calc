@@ -16,9 +16,10 @@ Language and Color are available dynamically.
 You can use this code to inject an app to any website using iframe
 
 <iframe
-src="https://teklif.az/?custom_base=EUR&custom_target=AZN&custom_rate=1.92&lang=ru&text=yellow&bg=black"
-height="300"
-></iframe>
+      src="https://teklif.az/?custom_base=EUR&custom_target=AZN&custom_rate=1.92&lang=rs&text=yellow&bg=black"
+      width="400"
+      height="300"
+    ></iframe>
 
 Additional user functionality, such as custom currency, color and languages, are available via the URL Query String.
 custom_base=EUR
