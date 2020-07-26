@@ -45,8 +45,8 @@ const App = () => {
       .then((doc) => {
         const codes = doc.data.map(({ code }) => code);
         setCurrList((prev) => [
-          ...prev.filter(({ code }) => !codes.includes(code)),
           ...doc.data,
+          ...prev.filter(({ code }) => !codes.includes(code)),
           ...doc.data.map(({ base, target, rate }) => ({
             code: target + base,
             base: target,
