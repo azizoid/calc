@@ -40,7 +40,7 @@ const App = () => {
     and immedeately create their reverse currency conversion.
     if for some reason there will be a problem, then we use the data you provided in a task
     */
-    fetch("https://teklif.az/api/")
+    fetch("https://good.rs/currency/api/")
       .then((response) => response.json())
       .then((doc) => {
         const codes = doc.data.map(({ code }) => code);
@@ -54,11 +54,11 @@ const App = () => {
             rate: ((1 / rate) * 1).toFixed(4),
           })),
         ]);
-        setDate((prev) => doc.date);
+        setDate(doc.date);
       })
       .catch((error) => {
         // setCurrList((prev) => [...prev, ...currencyList]);
-        console.error("Error:", error);
+        // console.error("Error:", error);
       });
 
     if (Object.keys(params).length > 0) {
@@ -234,9 +234,12 @@ const App = () => {
           </div>
           <form className="col-sm-12">
             <div className="form-row">
-              <div className="form-group col-4">{Localization[lang].base}:</div>
+              <label htmlFor="x1" className="form-group col-4">
+                {Localization[lang].base}:
+              </label>
               <div className="form-group col-4">
                 <input
+                  id="x1"
                   type="number"
                   placeholder="1"
                   min="0"
@@ -294,9 +297,9 @@ const App = () => {
               </div>
             </div>
             <div className="form-row">
-              <div className="form-group col-4">
+              <label htmlFor="x2" className="form-group col-4">
                 {Localization[lang].equals}:
-              </div>
+              </label>
               <div className="form-group col-4">
                 <input
                   type="number"

@@ -1,24 +1,32 @@
+This app was created as a result of a code challenge I had on one of my job interviews. After i finish I decided. why not share it.
+
+In order to get the latest currency list from the European Central Bank website, install nodejs server from the api folder
+
 ### [ First run and Creating of Currency List ]
+
 On the first run app gets currency values provide in the pdf file as default.
 After it uploads data from the API server, overriding the existing values.
 On this step we are creating the reverse currencies.
 Then checks if there is custom currency, adds it too.
 
 ### [ Conversion Form ]
+
 After creating the database, creating form with conversion algorithms was matter of time.
 
 ## [ List of available Currencies ]
+
 After all we print list of available currencies.
 
 ### [ Language and Colors]
+
 Language and Color are available dynamically.
 
 You can use this code to inject an app to any website using iframe
 
 > <iframe src="https://teklif.az/?custom_base=EUR&custom_target=AZN&custom_rate=1.92&lang=rs&text=yellow&bg=black" width="400" height="300"></iframe>
 
-
 Additional user functionality, such as custom currency, color and languages, are available via the URL Query String.
+
 - custom_base=EUR
 - custom_target=AZN
 - custom_rate=1.92
