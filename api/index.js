@@ -14,7 +14,7 @@ app.use(cors());
 app.use(helmet());
 app.disable("x-powered-by");
 
-app.get("/api", (req, res) => {
+app.get("/currency/api", (req, res) => {
   fetch("https://www.ecb.europa.eu/stats/eurofxref/eurofxref-daily.xml")
     .then((response) => response.text())
     .then((text) => {
